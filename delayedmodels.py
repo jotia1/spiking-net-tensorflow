@@ -73,8 +73,8 @@ class DelayedLIFNeurons(object):
     
     # update spike times
     self.input_last_spike_times = tf.where(tf.cast(spikes, tf.bool), 
-                                     tf.ones(self.input_last_spike_times.shape) * self.get_current_time(),
-                                    self.input_last_spike_times)
+      tf.ones(self.input_last_spike_times.shape) * self.get_current_time(),
+      self.input_last_spike_times)
     
     self.update_active_spikes(spikes)
     self.apply_stdp(spikes)
