@@ -10,21 +10,33 @@ To use this repository, first install tensorflow 2.0 as per the [tensorflow webs
 ```
 pip install tensorflow==2.0.0-alpha0
 ```
+Other required python libraries
+```
+pip install numpy, matplotlib
+```
 
 Clone this repository, change into the directory and run an example.
 
 ```
 git clone https://github.com/jotia1/spiking-net-tensorflow
-
 cd spiking-net-tensorflow
-
 python runnetwork.py
 ```
 
 A plot of the network should appear.
 
+## Tests
+To run tests ensure pytest is installed
+```
+pip install pytest
+```
+then run the below from the root directory
+```
+python -m pytest tests/
+```
 
-Key features:
+
+### Key features:
 - Plastic delays between neurons
 - Variable time step for simulations
 - LIF neurons implemented
@@ -32,7 +44,7 @@ Key features:
 - SDVL functional 
 
 
-A rough roadmap of development:
+### A rough roadmap of development:
 - Generate examples with delayed LIF neurons
 - Add tests
 - Add examples 
@@ -41,8 +53,7 @@ Initial development was done [here](https://colab.research.google.com/drive/1omp
 
 If you are interested in this space (spiking nets/delays/etc.) you are encouraged to get in contact with the author
 
-References:
-
+### References
 [1] Fields R. D. (2015). A new mechanism of nervous system plasticity: activity-dependent myelination. Nature reviews. Neuroscience, 16(12), 756–767. doi:10.1038/nrn4023
 
 [2] P. W. Wright and J. Wiles, “Learning transmission delays in spiking neural networks: A novel approach to sequence learning based on spike delay variance,” in The 2012 International Joint Conference on Neural Networks (IJCNN), 2012, pp. 1–8.
