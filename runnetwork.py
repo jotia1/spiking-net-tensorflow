@@ -88,7 +88,7 @@ def main():
     np.random.seed(0)
     model = DelayedLIFNeurons(N, n_in, timestep=dt)
 
-    num_inp_spikes = 100
+    #num_inp_spikes = 100
     #inp_data = np.array([np.random.randint(1, 99, [num_inp_spikes]), 
     #                    np.random.randint(0, 3,[num_inp_spikes])])
 

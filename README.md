@@ -1,5 +1,5 @@
 # spiking-net-tensorflow 2.0
-This repository has code to run spiking net simulations in Tensorflow 2.0. The code is under active development and the api/functions are prone to change. Feedback and comments are appreciated, contributions are also welcome. 
+This repository has code to run spiking net simulations in Tensorflow 2.0. The code is under active development and breaking changes to the api/functions are expected. Feedback and comments are appreciated, contributions are also welcome. 
 
 ## Plastic synaptic delays between neurons
 There is [some evidence](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6310485/)[1] to suggest delay plasticity is an active part of learning in the brain (much like STDP, but changing delays between neurons instead of weights). This repository differentiates itself from other spiking net simulators by having support for **plastic synaptic delays** between neurons. The implemented delay learning rule is SDVL outlined in [this paper](https://ieeexplore.ieee.org/document/6252371)[2].

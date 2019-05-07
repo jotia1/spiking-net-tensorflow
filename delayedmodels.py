@@ -1,14 +1,36 @@
 import numpy as np
 import tensorflow as tf
 
+NEURON_DEFAULT_PARAMS = {
+    'fgi':65,
+    'tau':20,
+    'v_rest':-65.0,
+    'v_thresh':-55,
+    'v_reset':-70,
+    'taupre':20,
+    'taupost':20,
+    'Apre':0.01,
+    'Apost':0.01,
+    'gaussian_synapses':True,
+    'W_MAX': 10,
+    'a1':3,
+    'a2':2,
+    'b1':5,
+    'b2':5,
+    'nu':0.03,
+    'nv':0.01,
+    'VARIANCE_MAX':10,
+    'VARIANCE_MIN':0.1,
+    }
+  
 
 class DelayedLIFNeurons(object):
-  
-  def __init__(self, num_neurons, num_inputs, delay_max=20, timestep=0.5):
+
+  def __init__(self, num_neurons, num_inputs, delay_max=20, timestep=0.5, **kwargs):
     self.dt = timestep
     self.num_neurons = num_neurons
     self.num_inputs = num_inputs
-    self.setup_neuron_constants()
+    self.set_neuron_attributes(**kwargs) 
     self._steps = 0
     
     self.v = tf.Variable(tf.ones([self.num_neurons]) * self.v_rest)
@@ -272,28 +294,56 @@ class DelayedLIFNeurons(object):
     """
     return self._steps * self.dt
   
-  def setup_neuron_constants(self):
+  def set_neuron_attributes(self, **kwargs):
     """ Setup a few variables, removed from __init__ to help keep it clear
     """
-    self.tau = 20.0
-    self.v_rest = -65
-    self.v_thresh = -55
-    self.v_reset = -70
-    self.fgi = 65
-    self.taupre = 20
-    self.taupost = 20
-    self.Apre = 0.01
-    self.Apost = - self.Apre * 1.05
-    self.gaussian_synapses = True
-    self.W_MAX = 10
+    # Variables left in because I don't want to see pylint errors everywhere...
+    # Bottom of method will overwrite all these values with defaults.
+    self.tau = None
+    self.v_rest = None
+    self.v_thresh = None
+    self.v_reset = None
+    self.fgi = None
+    self.taupre = None
+    self.taupost = None
+    self.Apre = None
+    self.Apost = None
+    self.gaussian_synapses = None
+    self.W_MAX = None
     
     # SDVL params
-    self.a1 = 3
-    self.a2 = 2
-    self.b1 = 5
-    self.b2 = 5
-    self.nu = 0.03
-    self.nv = 0.01
-    self.VARIANCE_MAX = 10
-    self.VARIANCE_MIN = 0.1
+    self.a1 = None
+    self.a2 = None
+    self.b1 = None
+    self.b2 = None
+    self.nu = None
+    self.nv = None
+    self.VARIANCE_MAX = None  # TODO : Why is this defined as a constant?
+    self.VARIANCE_MIN = None
+
+    default_params = {
+    'fgi':65,
+    'tau':20,
+    'v_rest':-65.0,
+    'v_thresh':-55,
+    'v_reset':-70,
+    'taupre':20,
+    'taupost':20,
+    'Apre':0.01,
+    'Apost':0.01,
+    'gaussian_synapses':True,
+    'W_MAX': 10,
+    'a1':3,
+    'a2':2,
+    'b1':5,
+    'b2':5,
+    'nu':0.03,
+    'nv':0.01,
+    'VARIANCE_MAX':10,
+    'VARIANCE_MIN':0.1,
+    }
+    default_params.update(kwargs)
+
+    for key, val in default_params.items():
+      setattr(self, key, val)
   
