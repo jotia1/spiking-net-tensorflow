@@ -4,6 +4,26 @@ This repository has code to run spiking net simulations in Tensorflow 2.0. The c
 ## Plastic synaptic delays between neurons
 There is [some evidence](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6310485/)[1] to suggest delay plasticity is an active part of learning in the brain (much like STDP, but changing delays between neurons instead of weights). This repository differentiates itself from other spiking net simulators by having support for **plastic synaptic delays** between neurons. The implemented delay learning rule is SDVL outlined in [this paper](https://ieeexplore.ieee.org/document/6252371)[2].
 
+## Usage
+To use this repository, first install tensorflow 2.0 as per the [tensorflow website](https://www.tensorflow.org/install/pip). Ealier versions of tensorflow will NOT work.
+
+```
+pip install tensorflow==2.0.0-alpha0
+```
+
+Clone this repository, change into the directory and run an example.
+
+```
+git clone https://github.com/jotia1/spiking-net-tensorflow
+
+cd spiking-net-tensorflow
+
+python runnetwork.py
+```
+
+A plot of the network should appear.
+
+
 Key features:
 - Plastic delays between neurons
 - Variable time step for simulations
