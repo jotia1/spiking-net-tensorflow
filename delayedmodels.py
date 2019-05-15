@@ -60,7 +60,11 @@ class DelayedLIFNeurons(object):
     self.dApost = tf.Variable(tf.zeros(self.w.shape))
     self.STDPdecaypre = tf.constant(tf.exp(-1 / self.taupre))
     self.STDPdecaypost = tf.constant(tf.exp(-1 / self.taupost))
+
+    self.dvar = tf.Variable(tf.zeros(self.variance.shape))
+    self.du = tf.Variable(tf.zeros(self.delays.shape))  # (num_inputs, num_neruons)
     
+    self.run_debugging = False
     self.debug = []
     self.dw = []
     self.ddapre = []
@@ -68,8 +72,8 @@ class DelayedLIFNeurons(object):
     
     self.ddu = []
     self.ddvar = []
-    
-  
+
+
   def __call__(self, spikes):
     """ The computation step for the neurons, called every timestep this function 
     updates the membrane voltage and keeps track of when neurons have fired.
@@ -81,7 +85,7 @@ class DelayedLIFNeurons(object):
       tf.tensor - a logical tenors where True are the neurons that spiked in this
         timestep
     """
-    
+
     iapp = self.spikes_to_current(spikes)
     
     # Calculate and update the value of the neuron membrane 
@@ -97,7 +101,7 @@ class DelayedLIFNeurons(object):
     self.input_last_spike_times = tf.where(tf.cast(spikes, tf.bool), 
       tf.ones(self.input_last_spike_times.shape) * self.get_current_time(),
       self.input_last_spike_times)
-    
+
     self.update_active_spikes(spikes)
     self.apply_stdp(spikes)
     self.apply_sdvl()
@@ -118,35 +122,38 @@ class DelayedLIFNeurons(object):
     k = tf.pow(self.variance + 0.9 ,2)  # (num_inputs, num_neurons)
     
     sgn = tf.sign(t0_negu)             # (num_inputs, num_neurons)
-    du = tf.Variable(tf.zeros(self.delays.shape))  # (num_inputs, num_neruons)
     # t0 >= a2 
     knu = k * self.nu               # (num_fired, num_neurons)
     a2_cond = tf.broadcast_to(tf.greater_equal(t0, self.a2), fired_mask.shape)  # (num_neurons)
-    du = tf.where(tf.equal(fired_mask, a2_cond), -knu, du )
+    self.du.assign(tf.where(tf.equal(fired_mask, a2_cond), -knu, self.du ))  
     
     # |t0 - u| >= a1
     a1_cond = tf.broadcast_to(tf.greater_equal(t0_negu, self.a1), fired_mask.shape)
-    du = tf.where(tf.equal(fired_mask, a1_cond), sgn * knu, du )
-    
-    self.delays.assign(tf.clip_by_value(tf.add(du, self.delays), 1, self.delay_max))
+    self.du.assign(tf.where(tf.equal(fired_mask, a1_cond), sgn * knu, self.du ))
+
+    self.delays.assign(tf.clip_by_value(tf.add(self.du, self.delays), 1, self.delay_max))
     #self.delays = tf.clip_by_value(self.delays, 1, self.delay_max)
-    
-    self.ddu.append(self.delays[0, 0])
-    
-    dvar = tf.Variable(tf.zeros(self.variance.shape))
+
+    if self.run_debugging:
+      self.ddu.append(self.delays[0, 0])
+
     knv = k * self.nv
     # | t0 - u | < b2
     b2_cond = tf.broadcast_to(tf.less(t0_negu, self.b2), fired_mask.shape)
-    dvar = tf.where(tf.equal(fired_mask, b2_cond), -knv, dvar)
+    self.dvar.assign(tf.where(tf.equal(fired_mask, b2_cond), -knv, self.dvar))
     # | t0 - u | >= b1
     b1_cond = tf.broadcast_to(tf.greater_equal(t0_negu, self.b1), fired_mask.shape)
-    dvar = tf.where(tf.equal(fired_mask, b1_cond), knv, dvar)
+    self.dvar.assign(tf.where(tf.equal(fired_mask, b1_cond), knv, self.dvar))
     
-    self.variance.assign(tf.clip_by_value(tf.add(dvar, self.variance), self.VARIANCE_MIN, self.VARIANCE_MAX))
+    self.variance.assign(tf.clip_by_value(tf.add(self.dvar, self.variance), self.VARIANCE_MIN, self.VARIANCE_MAX))
     #self.variance = tf.clip_by_value(self.variance, self.VARIANCE_MIN, self.VARIANCE_MAX)
     
-    self.ddvar.append(self.variance[0,0])
-    
+    if self.run_debugging:
+      self.ddvar.append(self.variance[0,0])
+
+    # Reset self.du and self.dvar to zeros
+    self.du.assign(tf.zeros(self.delays.shape))
+    self.dvar.assign(tf.zeros(self.variance.shape))
       
     # TODO: need to do max and min to constrain boundries.
         
@@ -227,9 +234,10 @@ class DelayedLIFNeurons(object):
     self.dApost = self.dApost * self.STDPdecaypost
     
     # Debugging logs for plotting...
-    self.dw.append(self.w[0,0])
-    self.ddapre.append(self.dApre[0, 0])
-    self.ddapost.append(self.dApost[0, 0])
+    if self.run_debugging:
+      self.dw.append(self.w[0,0])
+      self.ddapre.append(self.dApre[0, 0])
+      self.ddapost.append(self.dApost[0, 0])
     
   def spike_arrival_step(self, delays):
     """ Calculate the spike arrival step index into active spikes for the given
