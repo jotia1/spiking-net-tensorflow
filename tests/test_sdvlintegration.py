@@ -14,6 +14,10 @@ class TestSDVLIntegration():
             - Check what variables will keep track of the changes 
                 which will eventually be used in the comparison.
         """
+        
+        # TODO : This test is not practical whilst the simulator is so slow
+        assert False
+
         tf.random.set_seed(1)
         np.random.seed(0)
         dt = 1.0
