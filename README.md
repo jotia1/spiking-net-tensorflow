@@ -45,9 +45,10 @@ python -m pytest tests/
 
 
 ### A rough roadmap of development:
-- Generate examples with delayed LIF neurons
-- Add tests
-- Add examples 
+- [ ] Simplify running networks
+- [ ] Profile and Speed up code to realtime on a current laptop for small networks (<10 neurons)
+- [ ] Generate examples folder withh delayed LIF neurons
+- [ ] Add tests (see readme in tests folder)
 
 Initial development was done [here](https://colab.research.google.com/drive/1ompErt-hmnRBYUk6fjcRyqrc8Et2cXxY) and will give some insight into how the simulator works
 
